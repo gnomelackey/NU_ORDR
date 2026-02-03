@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Die } from "../components/Die";
-import { difficulties, DifficultyId } from "../data/hacking";
+import { difficulties } from "../data/hacking";
 
 const matrixSizes = [2, 4, 8, 16];
 const timerOptions = [
@@ -13,24 +13,21 @@ const timerOptions = [
 const rollDie = (sides: number) => Math.floor(Math.random() * sides) + 1;
 
 export function Hacking() {
-  const [difficultyId, setDifficultyId] = useState<DifficultyId>("normal");
-  const [matrixSize, setMatrixSize] = useState(
-    difficulties.normal.matrixSize
-  );
+  const [matrixSize, setMatrixSize] = useState(difficulties.normal.matrixSize);
   const [timer, setTimer] = useState(difficulties.normal.timer);
   const [breachCode, setBreachCode] = useState(rollDie(6));
   const [matrixDice, setMatrixDice] = useState<number[]>([]);
-  const [knowledge, setKnowledge] = useState(2);
+  const [knowledge, setKnowledge] = useState(0);
   const [attemptRoll, setAttemptRoll] = useState(rollDie(4));
 
   const attempts = useMemo(
     () => Math.max(1, knowledge + attemptRoll),
-    [knowledge, attemptRoll]
+    [knowledge, attemptRoll],
   );
 
   const breachMatches = useMemo(
     () => matrixDice.filter((value) => value === breachCode).length,
-    [matrixDice, breachCode]
+    [matrixDice, breachCode],
   );
 
   const outcome = useMemo(() => {
@@ -49,14 +46,16 @@ export function Hacking() {
     return "Success — limited access gained.";
   }, [breachMatches, matrixDice.length, matrixSize]);
 
-  const handleDifficulty = (id: DifficultyId) => {
-    setDifficultyId(id);
-    setMatrixSize(difficulties[id].matrixSize);
-    setTimer(difficulties[id].timer);
-    setMatrixDice([]);
-  };
-
   const rollBreach = () => setBreachCode(rollDie(6));
+  const rollKnowledge = () => setKnowledge(rollDie(4) - rollDie(4));
+  const handleBreachInput = (value: string) => {
+    const next = Number(value);
+    if (Number.isNaN(next)) {
+      return;
+    }
+    const clamped = Math.min(6, Math.max(1, next));
+    setBreachCode(clamped);
+  };
 
   const rollMatrix = () => {
     const next = Array.from({ length: matrixSize }, () => rollDie(6));
@@ -76,95 +75,133 @@ export function Hacking() {
             and visualize your roll before you dive deeper.
           </p>
         </div>
-        <div className="badge-stack">
-          <div className="badge">
-            <span className="badge-label">Breach Code</span>
-            <Die value={breachCode} size="lg" glow label="d6" />
-            <button className="button button--ghost" onClick={rollBreach}>
-              Roll Breach Code
-            </button>
-          </div>
-          <div className="badge">
-            <span className="badge-label">Attempts</span>
-            <div className="attempts">
-              <Die value={attemptRoll} size="sm" label="d4" />
-              <div className="attempts-meta">
-                <span>Knowledge</span>
-                <input
-                  className="input"
-                  type="number"
-                  value={knowledge}
-                  onChange={(event) =>
-                    setKnowledge(Number(event.target.value))
-                  }
-                />
-              </div>
-            </div>
-            <div className="attempts-total">
-              Attempts: <strong>{attempts}</strong>
-            </div>
-            <button className="button button--ghost" onClick={rollAttempts}>
-              Roll Attempts
-            </button>
-          </div>
-        </div>
       </div>
 
-      <div className="grid-two">
-        <div className="panel">
-          <h2>Difficulty Matrix</h2>
-          <div className="difficulty-row">
-            {(Object.keys(difficulties) as DifficultyId[]).map((id) => (
-              <button
-                key={id}
-                className={`chip ${
-                  difficultyId === id ? "chip--active" : ""
-                }`}
-                onClick={() => handleDifficulty(id)}
-              >
-                {difficulties[id].label}
-              </button>
-            ))}
-          </div>
-          <p className="muted">
-            {difficulties[difficultyId].examples}
-          </p>
-          <div className="form-grid">
-            <label className="field">
-              Challenge Matrix (d6 count)
-              <select
-                value={matrixSize}
-                onChange={(event) => {
-                  setMatrixSize(Number(event.target.value));
-                  setMatrixDice([]);
-                }}
-              >
-                {matrixSizes.map((size) => (
-                  <option key={size} value={size}>
-                    {size} dice
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              Real-time Limit
-              <select
-                value={timer}
-                onChange={(event) => setTimer(Number(event.target.value))}
-              >
-                {timerOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+      <div className="setup-grid">
+        <div className="panel setup-panel">
+          <h2>Hack Setup</h2>
           <div className="callout">
             <span>Active Matrix</span>
             <strong>
               {matrixSize}d6 • {timer === 0 ? "No timer" : `${timer}s`}
             </strong>
+          </div>
+          <div className="setup-section">
+            <span className="badge-label">Breach Code</span>
+            <div className="breach-input">
+              <input
+                className="input"
+                type="number"
+                min={1}
+                max={6}
+                value={breachCode}
+                onChange={(event) => handleBreachInput(event.target.value)}
+              />
+              <button className="button button--ghost" onClick={rollBreach}>
+                Roll d6
+              </button>
+            </div>
+          </div>
+
+          <div className="setup-section">
+            <span className="badge-label">
+              Breaching Attempts
+              <span
+                className="info-icon"
+                data-tooltip="Attempts = max(1, Knowledge + d4 roll). Knowledge can be rolled as d4 - d4."
+                aria-label="Attempts info"
+              >
+                i
+              </span>
+            </span>
+            <div className="attempts-equation">
+              <label className="equation-field">
+                <span className="equation-label">d4 Roll</span>
+                <input
+                  className="input equation-input"
+                  type="number"
+                  min={1}
+                  max={4}
+                  value={attemptRoll}
+                  onChange={(event) => {
+                    const next = Number(event.target.value);
+                    if (Number.isNaN(next)) {
+                      return;
+                    }
+                    setAttemptRoll(Math.min(4, Math.max(1, next)));
+                  }}
+                />
+              </label>
+              <span className="equation-symbol">+</span>
+              <label className="equation-field">
+                <span className="equation-label">Knowledge</span>
+                <input
+                  className="input equation-input"
+                  type="number"
+                  value={knowledge}
+                  onChange={(event) => setKnowledge(Number(event.target.value))}
+                />
+              </label>
+              <span className="equation-symbol">=</span>
+              <div className="equation-field">
+                <span className="equation-label">Attempts</span>
+                <input
+                  className="input equation-input"
+                  type="number"
+                  min={1}
+                  max={4}
+                  value={attempts}
+                  disabled
+                />
+              </div>
+            </div>
+            <div className="attempt-actions">
+              <button className="button button--ghost" onClick={rollAttempts}>
+                Roll d4
+              </button>
+              <button className="button button--ghost" onClick={rollKnowledge}>
+                Roll Knowledge (d4 - d4)
+              </button>
+            </div>
+          </div>
+
+          <div className="setup-section">
+            <span className="badge-label">Challenge Matrix</span>
+            <div className="radio-group">
+              {matrixSizes.map((size) => (
+                <label key={size} className="radio-item">
+                  <input
+                    type="radio"
+                    name="matrix-size"
+                    value={size}
+                    checked={matrixSize === size}
+                    onChange={() => {
+                      setMatrixSize(size);
+                      setMatrixDice([]);
+                    }}
+                  />
+                  <span>{size} d6</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="setup-section">
+            <span className="badge-label">Real-time Limit</span>
+            <div className="radio-group">
+              {timerOptions.map((option) => (
+                <label key={option.value} className="radio-item">
+                  <input
+                    type="radio"
+                    name="timer"
+                    value={option.value}
+                    checked={timer === option.value}
+                    onChange={() => setTimer(option.value)}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -187,6 +224,7 @@ export function Hacking() {
                   key={`${value}-${index}`}
                   value={value}
                   glow={value === breachCode}
+                  sides={6}
                 />
               ))
             )}
@@ -202,9 +240,16 @@ export function Hacking() {
         <div className="panel">
           <h2>Performing the Hack</h2>
           <ul className="rule-list">
-            <li>Each attempt allows one action: reroll, utilize a tool, or modify dice.</li>
-            <li>After each attempt, locked or successful dice are set aside.</li>
-            <li>Tools are single-use and shape the breach in different ways.</li>
+            <li>
+              Each attempt allows one action: reroll, utilize a tool, or modify
+              dice.
+            </li>
+            <li>
+              After each attempt, locked or successful dice are set aside.
+            </li>
+            <li>
+              Tools are single-use and shape the breach in different ways.
+            </li>
           </ul>
           <div className="tool-grid">
             {[
@@ -232,7 +277,10 @@ export function Hacking() {
             <li>Roll d6 for breach code, select a challenge matrix.</li>
             <li>Set the timer, start the breach, and burn attempts.</li>
             <li>Hack ends when attempts, time, or the PC stops.</li>
-            <li>Count matches to determine safeguard, failure, success, or full access.</li>
+            <li>
+              Count matches to determine safeguard, failure, success, or full
+              access.
+            </li>
           </ol>
           <div className="callout">
             <span>Deep Hack</span>

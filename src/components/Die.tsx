@@ -1,11 +1,10 @@
 type DieProps = {
   value: number;
-  size?: "sm" | "md" | "lg";
   glow?: boolean;
-  label?: string;
+  sides?: 4 | 6;
 };
 
-const pipMap: Record<number, number[]> = {
+const pipMapD6: Record<number, number[]> = {
   1: [4],
   2: [0, 8],
   3: [0, 4, 8],
@@ -14,12 +13,19 @@ const pipMap: Record<number, number[]> = {
   6: [0, 2, 3, 5, 6, 8],
 };
 
-export function Die({ value, size = "md", glow, label }: DieProps) {
-  const pips = pipMap[value] ?? [];
+const pipMapD4: Record<number, number[]> = {
+  1: [4],
+  2: [0, 8],
+  3: [0, 4, 8],
+  4: [0, 2, 6, 8],
+};
+
+export function Die({ value, glow, sides = 6 }: DieProps) {
+  const isD4 = sides === 4;
+  const pips = isD4 ? pipMapD4[value] ?? [] : pipMapD6[value] ?? [];
 
   return (
-    <div className={`die die--${size} ${glow ? "die--glow" : ""}`}>
-      {label ? <span className="die-label">{label}</span> : null}
+    <div className={`die ${glow ? "die--glow" : ""}`}>
       <div className="die-face">
         {Array.from({ length: 9 }).map((_, index) => (
           <span

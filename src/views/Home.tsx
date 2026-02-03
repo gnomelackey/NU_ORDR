@@ -19,9 +19,6 @@ export function Home() {
             <Link className="button" to="/hacking">
               Enter Hacking Suite
             </Link>
-            <Link className="button button--ghost" to="/codex">
-              View Codex
-            </Link>
           </div>
         </div>
         <div className="hero-panel">
