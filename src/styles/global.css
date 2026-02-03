@@ -5,17 +5,17 @@
   font-family: "Share Tech Mono", "Courier New", monospace;
   line-height: 1.6;
 
-  --bg: #07080c;
-  --bg-soft: #0e121a;
-  --panel: rgba(16, 22, 34, 0.92);
-  --panel-alt: rgba(10, 14, 22, 0.92);
-  --text: #e4eefc;
-  --muted: #8d9ab6;
-  --accent: #43f9ff;
-  --accent-2: #ff2fd4;
-  --accent-3: #80ff7f;
-  --border: rgba(103, 121, 153, 0.35);
-  --shadow: 0 20px 60px rgba(4, 6, 12, 0.65);
+  --bg: #030304;
+  --bg-soft: #0a0a0b;
+  --panel: rgba(12, 12, 12, 0.92);
+  --panel-alt: rgba(7, 7, 8, 0.92);
+  --text: #f8f8f8;
+  --muted: #b3b3b3;
+  --accent: #e10600;
+  --accent-2: #ff3b30;
+  --accent-3: #ffffff;
+  --border: rgba(225, 6, 0, 0.25);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
 }
 
 *,
@@ -26,8 +26,8 @@
 
 body {
   margin: 0;
-  background: radial-gradient(circle at top, rgba(18, 25, 40, 0.9), transparent 55%),
-    linear-gradient(140deg, #05070c 0%, #0b1220 55%, #04040a 100%);
+  background: radial-gradient(circle at top, rgba(255, 59, 48, 0.08), transparent 55%),
+    linear-gradient(160deg, #020202 0%, #0a0a0b 55%, #020202 100%);
   color: var(--text);
 }
 
@@ -57,8 +57,8 @@ select {
   inset: 0;
   background: repeating-linear-gradient(
     90deg,
-    rgba(67, 249, 255, 0.04),
-    rgba(67, 249, 255, 0.04) 1px,
+    rgba(225, 6, 0, 0.06),
+    rgba(225, 6, 0, 0.06) 1px,
     transparent 1px,
     transparent 60px
   );
@@ -76,7 +76,7 @@ select {
   z-index: 10;
   background: rgba(6, 8, 12, 0.85);
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(67, 249, 255, 0.12);
+  border-bottom: 1px solid rgba(225, 6, 0, 0.2);
 }
 
 .brand {
@@ -118,9 +118,9 @@ select {
 
 .nav-link:hover,
 .nav-link--active {
-  border-color: rgba(67, 249, 255, 0.4);
+  border-color: rgba(225, 6, 0, 0.5);
   color: var(--text);
-  box-shadow: 0 0 25px rgba(67, 249, 255, 0.2);
+  box-shadow: 0 0 25px rgba(225, 6, 0, 0.25);
 }
 
 .main-content {
@@ -136,7 +136,7 @@ select {
   text-transform: uppercase;
   letter-spacing: 0.2rem;
   color: var(--muted);
-  border-top: 1px solid rgba(67, 249, 255, 0.12);
+  border-top: 1px solid rgba(225, 6, 0, 0.2);
 }
 
 .page {
@@ -169,7 +169,7 @@ select {
   font-size: 0.7rem;
   letter-spacing: 0.4rem;
   text-transform: uppercase;
-  color: var(--accent-2);
+  color: var(--accent);
   margin: 0 0 16px;
 }
 
@@ -260,12 +260,12 @@ select {
   padding: 16px;
   border-radius: 12px;
   text-align: center;
-  color: var(--accent-3);
+  color: var(--text);
   animation: pulse 3s ease-in-out infinite;
 }
 
 .button {
-  background: linear-gradient(120deg, rgba(67, 249, 255, 0.4), rgba(255, 47, 212, 0.6));
+  background: linear-gradient(120deg, rgba(225, 6, 0, 0.8), rgba(255, 59, 48, 0.9));
   border: 1px solid transparent;
   border-radius: 999px;
   padding: 10px 20px;
@@ -278,12 +278,12 @@ select {
 
 .button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(67, 249, 255, 0.25);
+  box-shadow: 0 12px 30px rgba(225, 6, 0, 0.35);
 }
 
 .button--ghost {
   background: transparent;
-  border: 1px solid rgba(67, 249, 255, 0.35);
+  border: 1px solid rgba(225, 6, 0, 0.45);
 }
 
 .panel {
@@ -354,7 +354,7 @@ select {
 .chip--active {
   border-color: var(--accent);
   color: var(--text);
-  box-shadow: 0 0 20px rgba(67, 249, 255, 0.2);
+  box-shadow: 0 0 20px rgba(225, 6, 0, 0.3);
 }
 
 .form-grid {
@@ -376,7 +376,7 @@ select {
 .input {
   padding: 10px 12px;
   background: rgba(6, 8, 12, 0.8);
-  border: 1px solid rgba(67, 249, 255, 0.25);
+  border: 1px solid rgba(225, 6, 0, 0.35);
   border-radius: 10px;
 }
 
@@ -405,7 +405,7 @@ select {
 
 .empty-state {
   color: var(--muted);
-  border: 1px dashed rgba(67, 249, 255, 0.25);
+  border: 1px dashed rgba(225, 6, 0, 0.3);
   border-radius: 12px;
   padding: 18px;
 }
@@ -419,12 +419,12 @@ select {
   display: grid;
   gap: 8px;
   justify-items: center;
-  box-shadow: inset 0 0 12px rgba(67, 249, 255, 0.1);
+  box-shadow: inset 0 0 12px rgba(225, 6, 0, 0.2);
 }
 
 .die--glow {
-  border-color: rgba(67, 249, 255, 0.7);
-  box-shadow: 0 0 18px rgba(67, 249, 255, 0.4);
+  border-color: rgba(225, 6, 0, 0.8);
+  box-shadow: 0 0 18px rgba(225, 6, 0, 0.45);
 }
 
 .die--sm {
@@ -456,7 +456,7 @@ select {
 
 .pip--on {
   background: var(--accent);
-  box-shadow: 0 0 12px rgba(67, 249, 255, 0.8);
+  box-shadow: 0 0 12px rgba(225, 6, 0, 0.8);
 }
 
 .die-value {
@@ -477,8 +477,8 @@ select {
   align-items: center;
   padding: 12px 14px;
   border-radius: 12px;
-  background: rgba(67, 249, 255, 0.08);
-  border: 1px solid rgba(67, 249, 255, 0.2);
+  background: rgba(225, 6, 0, 0.08);
+  border: 1px solid rgba(225, 6, 0, 0.3);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.12rem;
