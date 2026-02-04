@@ -1,4 +1,4 @@
-type DieProps = {
+export type DieProps = {
   value: number;
   glow?: boolean;
   sides?: 4 | 6;
@@ -21,8 +21,7 @@ const pipMapD4: Record<number, number[]> = {
 };
 
 export function Die({ value, glow, sides = 6 }: DieProps) {
-  const isD4 = sides === 4;
-  const pips = isD4 ? pipMapD4[value] ?? [] : pipMapD6[value] ?? [];
+  const pips = sides === 4 ? pipMapD4[value] ?? [] : pipMapD6[value] ?? [];
 
   return (
     <div className={`die ${glow ? "die--glow" : ""}`}>
