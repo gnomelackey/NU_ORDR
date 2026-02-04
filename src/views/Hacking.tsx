@@ -27,6 +27,7 @@ export function Hacking() {
   const [deepHackMode, setDeepHackMode] = useState(false);
   const [hackEnded, setHackEnded] = useState(false);
   const [subsystemsHacked, setSubsystemsHacked] = useState(0);
+  const [hackPaused, setHackPaused] = useState(false);
 
   const attempts = useMemo(
     () => Math.max(1, knowledge + attemptRoll),
@@ -43,10 +44,17 @@ export function Hacking() {
     [matrixDice, breachCode],
   );
 
-  const fullAccessAchieved = matrixDice.length > 0 && breachMatches === matrixSize;
+  const fullAccessAchieved =
+    matrixDice.length > 0 && breachMatches === matrixSize;
   const timerExpired = !deepHackMode && timer > 0 && timeLeft === 0;
   const showDeepHackChoice =
     !deepHackMode && !hackEnded && fullAccessAchieved && attemptsRemaining > 0;
+  const hackComplete =
+    matrixDice.length > 0 &&
+    !showDeepHackChoice &&
+    (hackEnded || attemptsRemaining === 0 || timerExpired);
+  const hackInProgress =
+    matrixDice.length > 0 && !hackComplete && !showDeepHackChoice;
 
   const outcome = useMemo(() => {
     if (matrixDice.length === 0) {
@@ -68,7 +76,13 @@ export function Hacking() {
       return "Complete Success — full access gained.";
     }
     return "Success — limited access gained.";
-  }, [breachMatches, deepHackMode, matrixDice.length, matrixSize, subsystemsHacked]);
+  }, [
+    breachMatches,
+    deepHackMode,
+    matrixDice.length,
+    matrixSize,
+    subsystemsHacked,
+  ]);
 
   const resetHackFromSetupChange = () => {
     setMatrixDice([]);
@@ -77,6 +91,7 @@ export function Hacking() {
     setDeepHackMode(false);
     setHackEnded(false);
     setSubsystemsHacked(0);
+    setHackPaused(false);
     setTimeLeft(0);
   };
 
@@ -116,6 +131,7 @@ export function Hacking() {
     setDeepHackMode(false);
     setHackEnded(false);
     setSubsystemsHacked(0);
+    setHackPaused(false);
   };
 
   const rollAttempts = () => {
@@ -143,9 +159,12 @@ export function Hacking() {
 
     setDeepHackMode(true);
     setHackEnded(false);
+    setHackPaused(false);
     setBreachCode(nextBreach);
     setMatrixDice(nextMatrix);
-    setSubsystemsHacked(nextMatrix.filter((die) => die.status === "success").length);
+    setSubsystemsHacked(
+      nextMatrix.filter((die) => die.status === "success").length,
+    );
     setTimeLeft(0);
     setSelectedDice([]);
   };
@@ -168,6 +187,7 @@ export function Hacking() {
       selectedDice.length !== 2 ||
       timerExpired ||
       hackEnded ||
+      hackPaused ||
       showDeepHackChoice
     ) {
       return;
@@ -221,6 +241,7 @@ export function Hacking() {
       matrixDice.length === 0 ||
       timerExpired ||
       hackEnded ||
+      hackPaused ||
       showDeepHackChoice
     ) {
       return;
@@ -247,7 +268,13 @@ export function Hacking() {
       setTimeLeft(timer);
       return;
     }
-    if (attemptsRemaining === 0 || timeLeft === 0 || deepHackMode || hackEnded) {
+    if (
+      attemptsRemaining === 0 ||
+      timeLeft === 0 ||
+      deepHackMode ||
+      hackEnded ||
+      hackPaused
+    ) {
       return;
     }
     const interval = window.setInterval(() => {
@@ -261,7 +288,15 @@ export function Hacking() {
     }, 1000);
 
     return () => window.clearInterval(interval);
-  }, [timer, matrixDice.length, attemptsRemaining, timeLeft, deepHackMode, hackEnded]);
+  }, [
+    timer,
+    matrixDice.length,
+    attemptsRemaining,
+    timeLeft,
+    deepHackMode,
+    hackEnded,
+    hackPaused,
+  ]);
 
   useEffect(() => {
     if (!deepHackMode) {
@@ -282,6 +317,8 @@ export function Hacking() {
   const removedDice = matrixDice.filter(
     (die) => die.status === "locked" || die.status === "success",
   );
+  const successDice = matrixDice.filter((die) => die.status === "success");
+  const lockedDice = matrixDice.filter((die) => die.status === "locked");
 
   return (
     <section className="page hacking-page">
@@ -292,7 +329,7 @@ export function Hacking() {
       </div>
 
       <div className="setup-grid">
-        <div className="panel setup-panel">
+        <div className="panel setup-panel panel-content">
           <h2>Hack Setup</h2>
           <div className="setup-section">
             <span className="badge-label">Breach Code</span>
@@ -418,154 +455,220 @@ export function Hacking() {
           </div>
         </div>
 
-        <div className="panel">
-          <div className="panel-header">
-            <div className="matrix-title">
-              <h2 className="matrix-title-heading">Matrix Dice</h2>
-              <span className="matrix-meta-inline">
-                {matrixSize}d6 • {timer === 0 ? "No timer" : `${timer}s`}
-              </span>
-            </div>
-            <div className="matrix-header-actions">
-              <button className="button" onClick={rollMatrix}>
-                {matrixDice.length === 0 ? "Start Hack" : "Reset Hack"}
-              </button>
+        <div className="panel matrix-panel">
+          <div className="panel-content">
+            <div className="panel-header matrix-header">
+              <div className="matrix-title">
+                <h2 className="matrix-title-heading">Matrix Dice</h2>
+                <span className="matrix-meta-inline">
+                  {matrixSize}d6 • {timer === 0 ? "No timer" : `${timer}s`}
+                </span>
+              </div>
+              <div className="matrix-header-actions">
+                <button className="button" onClick={rollMatrix}>
+                  {matrixDice.length === 0 ? "Start Hack" : "Reset Hack"}
+                </button>
               <button
                 className="button button--ghost"
                 onClick={rerollActiveDice}
                 disabled={
                   matrixDice.length === 0 ||
-                  attemptsRemaining <= 0 ||
-                  timerExpired ||
-                  hackEnded ||
+                    attemptsRemaining <= 0 ||
+                    timerExpired ||
+                    hackEnded ||
+                    hackPaused ||
                   showDeepHackChoice
                 }
+                style={{ display: matrixDice.length === 0 ? "none" : "inline-flex" }}
               >
                 Reroll Unlocked
               </button>
-            </div>
-          </div>
-          <div className="matrix-timer">
-            <div className="matrix-timer__header">
-              <span className="badge-label">Timer</span>
-              {showDeepHackChoice ? (
-                <span className="muted">Stopped (Full Access)</span>
-              ) : deepHackMode ? (
-                <span className="muted">Stopped (Deep Hack)</span>
-              ) : timer === 0 ? (
-                <span className="muted">No timer</span>
-              ) : (
-                <span className="timer-bar__label">{timeLeft}s</span>
-              )}
-            </div>
-            {timer === 0 || deepHackMode || showDeepHackChoice ? null : (
-              <div className="timer-bar">
-                <div
-                  className="timer-bar__fill"
-                  style={{
-                    width: `${(timeLeft / timer) * 100}%`,
-                  }}
-                />
-              </div>
-            )}
-          </div>
-          <div className="matrix-meta">
-            <div className="attempts-remaining">
-              Attempts remaining: <strong>{attemptsRemaining}</strong> /{" "}
-              {attempts}
-            </div>
-          </div>
-          {showDeepHackChoice ? (
-            <div className="deep-hack-prompt">
-              <span>
-                Full access achieved. Dive deeper into subsystems?
-              </span>
-              <div className="matrix-actions">
-                <button className="button button--ghost" onClick={startDeepHack}>
-                  Hack Deeper
-                </button>
-                <button className="button button--ghost" onClick={endHackNow}>
-                  End Hack
-                </button>
-              </div>
-            </div>
-          ) : null}
-          {selectedDice.length === 2 ? (
-            <div className="matrix-actions">
-              <button
-                className="button button--ghost"
-                onClick={() => applyModification("add")}
-                disabled={
-                  attemptsRemaining <= 0 ||
-                  timerExpired ||
-                  hackEnded ||
-                  showDeepHackChoice
-                }
-              >
-                Add Selected
-              </button>
-              <button
-                className="button button--ghost"
-                onClick={() => applyModification("subtract")}
-                disabled={
-                  attemptsRemaining <= 0 ||
-                  timerExpired ||
-                  hackEnded ||
-                  showDeepHackChoice
-                }
-              >
-                Subtract Selected
-              </button>
-            </div>
-          ) : null}
-          <div className="dice-grid">
-            {matrixDice.length === 0 ? (
-              <div className="empty-state">Awaiting matrix roll.</div>
-            ) : (
-              activeDice.map((die) => (
+              {hackInProgress && timer > 0 ? (
                 <button
-                  key={die.id}
-                  type="button"
-                  className={`die-button ${
-                    selectedDice.includes(die.id) ? "die-button--selected" : ""
-                  }`}
-                  onClick={() => toggleDieSelection(die.id)}
+                  className="button button--ghost"
+                  onClick={() => setHackPaused((prev) => !prev)}
                 >
-                  <Die value={die.value} glow={die.value === breachCode} />
-                </button>
-              ))
-            )}
-          </div>
-          <div className="dice-removed">
-            <span className="badge-label">Locked + Success</span>
-            <div className="dice-removed-grid">
-              {removedDice.length === 0 ? (
-                <span className="muted">None yet.</span>
-              ) : (
-                removedDice.map((die) => (
-                  <div
-                    key={die.id}
-                    className={`die-removed ${
-                      die.status === "success" ? "die-removed--success" : ""
-                    }`}
-                  >
-                    <Die value={die.value} glow={die.status === "success"} />
+                    {hackPaused ? "Resume Hack" : "Pause Hack"}
+                  </button>
+                ) : null}
+              </div>
+            </div>
+            <div className="matrix-body">
+              <div className="matrix-timer">
+                <div className="matrix-timer__header">
+                  <span className="badge-label">Timer</span>
+                  {showDeepHackChoice ? (
+                    <span className="muted">Stopped (Full Access)</span>
+                  ) : deepHackMode ? (
+                    <span className="muted">Stopped (Deep Hack)</span>
+                  ) : hackPaused ? (
+                    <span className="muted">Paused</span>
+                  ) : timer === 0 ? (
+                    <span className="muted">No timer</span>
+                  ) : (
+                    <span className="timer-bar__label">{timeLeft}s</span>
+                  )}
+                </div>
+                {timer === 0 ||
+                deepHackMode ||
+                showDeepHackChoice ||
+                hackPaused ? null : (
+                  <div className="timer-bar">
+                    <div
+                      className="timer-bar__fill"
+                      style={{
+                        width: `${(timeLeft / timer) * 100}%`,
+                      }}
+                    />
                   </div>
-                ))
-              )}
+                )}
+              </div>
+              <div className="matrix-meta">
+                <div className="attempts-remaining">
+                  Attempts remaining: <strong>{attemptsRemaining}</strong> /{" "}
+                  {attempts}
+                </div>
+              </div>
+              {showDeepHackChoice ? (
+                <div className="deep-hack-prompt">
+                  <span>
+                    Full access achieved. Dive deeper into subsystems?
+                  </span>
+                  <div className="matrix-actions">
+                    <button
+                      className="button button--ghost"
+                      onClick={startDeepHack}
+                    >
+                      Hack Deeper
+                    </button>
+                    <button
+                      className="button button--ghost"
+                      onClick={endHackNow}
+                    >
+                      End Hack
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+              {selectedDice.length === 2 ? (
+                <div className="matrix-actions">
+                  <button
+                    className="button button--ghost"
+                    onClick={() => applyModification("add")}
+                    disabled={
+                      attemptsRemaining <= 0 ||
+                      timerExpired ||
+                      hackEnded ||
+                      hackPaused ||
+                      showDeepHackChoice
+                    }
+                  >
+                    Add Selected
+                  </button>
+                  <button
+                    className="button button--ghost"
+                    onClick={() => applyModification("subtract")}
+                    disabled={
+                      attemptsRemaining <= 0 ||
+                      timerExpired ||
+                      hackEnded ||
+                      hackPaused ||
+                      showDeepHackChoice
+                    }
+                  >
+                    Subtract Selected
+                  </button>
+                </div>
+              ) : null}
+              <div className="dice-grid">
+                {matrixDice.length === 0 ? (
+                  <div className="empty-state">Awaiting matrix roll.</div>
+                ) : (
+                  activeDice.map((die) => (
+                    <button
+                      key={die.id}
+                      type="button"
+                      className={`die-button ${
+                        selectedDice.includes(die.id)
+                          ? "die-button--selected"
+                          : ""
+                      }`}
+                      onClick={() => toggleDieSelection(die.id)}
+                    >
+                      <Die value={die.value} glow={die.value === breachCode} />
+                    </button>
+                  ))
+                )}
+              </div>
+              <div className="dice-removed">
+                <span className="badge-label">Locked + Success</span>
+                <div className="dice-removed-grid">
+                  {removedDice.length === 0 ? (
+                    <span className="muted">None yet.</span>
+                  ) : (
+                    removedDice.map((die) => (
+                      <div
+                        key={die.id}
+                        className={`die-removed ${
+                          die.status === "success" ? "die-removed--success" : ""
+                        }`}
+                      >
+                        <Die
+                          value={die.value}
+                          glow={die.status === "success"}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+            <div
+              className={`outcome-overlay ${hackComplete ? "outcome-overlay--open" : ""}`}
+            >
+              <div className="outcome-card">
+                <div className="outcome-card-header">
+                  <span className="badge-label">Outcome</span>
+                  <strong>{outcome}</strong>
+                </div>
+                <div className="outcome-dice">
+                  <div className="outcome-dice-group">
+                    <span className="badge-label">Success Dice</span>
+                    <div className="outcome-dice-grid">
+                      {successDice.length === 0 ? (
+                        <span className="muted">None</span>
+                      ) : (
+                        successDice.map((die) => (
+                          <div
+                            key={`success-${die.id}`}
+                            className="outcome-die"
+                          >
+                            <Die value={die.value} glow />
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                  <div className="outcome-dice-group">
+                    <span className="badge-label">Locked Dice</span>
+                    <div className="outcome-dice-grid">
+                      {lockedDice.length === 0 ? (
+                        <span className="muted">None</span>
+                      ) : (
+                        lockedDice.map((die) => (
+                          <div key={`locked-${die.id}`} className="outcome-die">
+                            <Die value={die.value} />
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          {matrixDice.length > 0 &&
-          !showDeepHackChoice &&
-          (hackEnded || attemptsRemaining === 0 || timerExpired) ? (
-            <div className="callout">
-              <span>Outcome</span>
-              <strong>{outcome}</strong>
-            </div>
-          ) : null}
         </div>
       </div>
-
     </section>
   );
 }

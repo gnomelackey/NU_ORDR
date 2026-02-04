@@ -310,12 +310,26 @@ select {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 20px;
-  padding: 24px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   gap: 16px;
   animation: rise 0.6s ease-out both;
+}
+
+.panel-content {
+  padding: 24px;
+  position: relative;
+}
+
+.matrix-panel {
+  position: relative;
+}
+
+.matrix-body {
+  position: relative;
+  display: grid;
+  gap: 32px;
 }
 
 .grid-two {
@@ -373,6 +387,10 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.matrix-header {
+  padding-bottom: 16px;
 }
 
 .matrix-title {
@@ -612,6 +630,62 @@ select {
   letter-spacing: 0.1rem;
 }
 
+.outcome-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateY(102%);
+  opacity: 0;
+  transition:
+    transform 0.35s ease,
+    opacity 0.25s ease;
+}
+
+.outcome-overlay--open {
+  transform: translateY(75px);
+  opacity: 1;
+}
+
+.outcome-card {
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+  border-top: 1px solid var(--accent);
+  background: rgba(8, 8, 8, 0.96);
+  box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.55);
+  display: grid;
+  align-content: start;
+  gap: 32px;
+}
+
+.outcome-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 8px;
+}
+
+.outcome-dice {
+  display: grid;
+  gap: 14px;
+}
+
+.outcome-dice-group {
+  display: grid;
+  gap: 8px;
+}
+
+.outcome-dice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.outcome-die {
+  transform: scale(0.85);
+  transform-origin: top left;
+}
+
 .matrix-header-actions {
   display: flex;
   gap: 10px;
@@ -664,7 +738,7 @@ select {
 }
 
 .attempts-remaining {
-  padding: 8px 12px;
+  padding: 8px;
   border-radius: 12px;
   border: 1px solid var(--accent);
   background: rgba(225, 6, 0, 0.08);
@@ -677,6 +751,7 @@ select {
   gap: 8px;
   width: fit-content;
   margin-left: auto;
+  height: fit-content;
 }
 
 .die-button {
