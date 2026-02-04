@@ -1,8 +1,9 @@
-import { Button } from "../../../../components/Button";
 import { Input } from "../../../../components/Input";
 import { Panel } from "../../../../components/Panel";
 import { RadioGroup } from "../../../../components/RadioGroup";
-import { useHackingContext } from "../HackingContext";
+import { matrixSizes } from "../../_constants/matrix";
+import { timerOptions } from "../../_constants/timer";
+import { useHackingContext } from "../../_contexts/HackingContext";
 
 export function HackSetupView() {
   const {
@@ -12,8 +13,6 @@ export function HackSetupView() {
     attempts,
     matrixSize,
     timer,
-    matrixSizes,
-    timerOptions,
     handleBreachInput,
     rollBreach,
     handleAttemptRollChange,
@@ -36,13 +35,10 @@ export function HackSetupView() {
             max={6}
             value={breachCode}
             onChange={(event) => handleBreachInput(event.target.value)}
+            diceAction={{ label: "Roll d6", onClick: rollBreach }}
           />
-          <Button variant="ghost" onClick={rollBreach}>
-            Roll d6
-          </Button>
         </div>
       </div>
-
       <div className="setup-section">
         <span className="badge-label">
           Breaching Attempts
@@ -66,6 +62,7 @@ export function HackSetupView() {
               onChange={(event) =>
                 handleAttemptRollChange(Number(event.target.value))
               }
+              diceAction={{ label: "Roll d4", onClick: rollAttempts }}
             />
           </label>
           <span className="equation-symbol">+</span>
@@ -78,34 +75,33 @@ export function HackSetupView() {
               onChange={(event) =>
                 handleKnowledgeChange(Number(event.target.value))
               }
+              diceAction={{ label: "Roll d4 - d4", onClick: rollKnowledge }}
             />
           </label>
           <span className="equation-symbol">=</span>
           <div className="equation-field">
             <span className="equation-label">Attempts</span>
-            <Input className="equation-input" type="number" value={attempts} disabled />
+            <Input
+              className="equation-input"
+              type="number"
+              value={attempts}
+              disabled
+            />
           </div>
         </div>
-        <div className="attempt-actions">
-          <Button variant="ghost" onClick={rollAttempts}>
-            Roll d4
-          </Button>
-          <Button variant="ghost" onClick={rollKnowledge}>
-            Roll Knowledge (d4 - d4)
-          </Button>
-        </div>
       </div>
-
       <div className="setup-section">
         <span className="badge-label">Challenge Matrix</span>
         <RadioGroup
           name="matrix-size"
           value={matrixSize}
-          options={matrixSizes.map((size) => ({ value: size, label: `${size} d6` }))}
+          options={matrixSizes.map((size) => ({
+            value: size,
+            label: `${size} d6`,
+          }))}
           onChange={handleMatrixSizeChange}
         />
       </div>
-
       <div className="setup-section">
         <span className="badge-label">Real-time Limit</span>
         <RadioGroup

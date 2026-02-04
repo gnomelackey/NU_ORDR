@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { HackingProvider } from "../HackingContext";
+import { HackingProvider } from "../../_contexts/HackingContext";
 import { MatrixDiceView } from "./MatrixDiceView";
 
 describe("MatrixDiceView", () => {

@@ -16,4 +16,19 @@ describe("Input", () => {
     });
     expect(onChange).toHaveBeenCalledTimes(1);
   });
+
+  it("renders dice action button and triggers click", () => {
+    const onClick = vi.fn();
+    render(
+      <Input
+        aria-label="Breach"
+        value="3"
+        onChange={() => {}}
+        diceAction={{ label: "Roll d6", onClick }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Roll d6" }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
 });

@@ -349,6 +349,7 @@ select {
   position: sticky;
   top: 120px;
   align-self: start;
+  gap: 32px;
 }
 
 .setup-section {
@@ -494,6 +495,60 @@ select {
   background: rgba(6, 8, 12, 0.8);
   border: 1px solid rgba(225, 6, 0, 0.35);
   border-radius: 10px;
+}
+
+.input-with-dice {
+  position: relative;
+  display: inline-flex;
+}
+
+.input-dice {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 0;
+  background: rgba(6, 6, 6, 0.8);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.input-dice-face {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(225, 6, 0, 0.7);
+  position: relative;
+}
+
+.input-dice-face:hover {
+  border: 1px solid rgb(255, 255, 255);
+}
+
+.input-dice-face::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(225, 6, 0, 0.9);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.input-dice-face::after:hover {
+  background: rgb(255, 255, 255);
+}
+
+.input--with-dice {
+  padding-right: 52px;
 }
 
 .attempts {

@@ -1,7 +1,7 @@
 import { Button } from "../../../../components/Button";
 import { Die } from "../../../../components/Die";
 import { Panel } from "../../../../components/Panel";
-import { useHackingContext } from "../HackingContext";
+import { useHackingContext } from "../../_contexts/HackingContext";
 
 export function MatrixDiceView() {
   const {

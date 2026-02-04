@@ -6,64 +6,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { difficulties } from "../../../data/hacking";
-import type { MatrixDie } from "./types";
 
-const matrixSizes = [2, 4, 8, 16];
+import { difficulties } from "../_constants/difficulties";
+import type { HackingContextValue, MatrixDie } from "../types";
 
-const timerOptions = [
-  { label: "No timer", value: 0 },
-  { label: "30 seconds", value: 30 },
-  { label: "20 seconds", value: 20 },
-  { label: "10 seconds", value: 10 },
-];
-
-const rollDie = (sides: number) => Math.floor(Math.random() * sides) + 1;
-
-type HackingContextValue = {
-  applyModification: (mode: "add" | "subtract") => void;
-  endHackNow: () => void;
-  handleAttemptRollChange: (value: number) => void;
-  handleBreachInput: (value: string) => void;
-  handleKnowledgeChange: (value: number) => void;
-  handleMatrixSizeChange: (size: number) => void;
-  handleTimerChange: (value: number) => void;
-  rerollActiveDice: () => void;
-  rollAttempts: () => void;
-  rollBreach: () => void;
-  rollKnowledge: () => void;
-  rollMatrix: () => void;
-  startDeepHack: () => void;
-  toggleDieSelection: (id: string) => void;
-  togglePause: () => void;
-  activeDice: MatrixDie[];
-  attemptRoll: number;
-  attempts: number;
-  attemptsRemaining: number;
-  breachCode: number;
-  deepHackMode: boolean;
-  hackComplete: boolean;
-  hackEnded: boolean;
-  hackInProgress: boolean;
-  hackPaused: boolean;
-  knowledge: number;
-  lockedDice: MatrixDie[];
-  matrixDiceLength: number;
-  matrixSize: number;
-  matrixSizes: number[];
-  noActiveDiceRemaining: boolean;
-  outcome: string;
-  removedDice: MatrixDie[];
-  selectedDice: string[];
-  showDeepHackChoice: boolean;
-  successDice: MatrixDie[];
-  timeLeft: number;
-  timer: number;
-  timerExpired: boolean;
-  timerOptions: { label: string; value: number }[];
-};
-
-const HackingContext = createContext<HackingContextValue | null>(null);
+function rollDie(sides: number) {
+  return Math.floor(Math.random() * sides) + 1;
+}
 
 function calculateDiceValue(
   die: MatrixDie,
@@ -102,6 +51,8 @@ function buildMatrix(size: number, breach: number): MatrixDie[] {
     status: die.value === breach ? "success" : "active",
   }));
 }
+
+const HackingContext = createContext<HackingContextValue | null>(null);
 
 export function HackingProvider({ children }: { children: ReactNode }) {
   const [attemptRoll, setAttemptRoll] = useState(rollDie(4));
@@ -425,7 +376,6 @@ export function HackingProvider({ children }: { children: ReactNode }) {
     lockedDice,
     matrixDiceLength: matrixDice.length,
     matrixSize,
-    matrixSizes,
     noActiveDiceRemaining,
     outcome,
     removedDice,
@@ -435,7 +385,6 @@ export function HackingProvider({ children }: { children: ReactNode }) {
     timeLeft,
     timer,
     timerExpired,
-    timerOptions,
   };
 
   return (
