@@ -1,6 +1,5 @@
 import { Button } from "../../../../components/Button";
 import { Die } from "../../../../components/Die";
-import { Panel } from "../../../../components/Panel";
 import { useHackingContext } from "../../_contexts/HackingContext";
 
 export function MatrixDiceView() {
@@ -44,7 +43,7 @@ export function MatrixDiceView() {
     noActiveDiceRemaining;
 
   return (
-    <Panel className="matrix-panel">
+    <div className="panel matrix-panel">
       <div className="panel-content">
         <div className="panel-header matrix-header">
           <div className="matrix-title">
@@ -201,6 +200,6 @@ export function MatrixDiceView() {
           </div>
         </div>
       </div>
-    </Panel>
+    </div>
   );
 }

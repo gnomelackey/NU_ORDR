@@ -319,6 +319,7 @@ select {
 
 .panel-content {
   padding: 24px;
+  top: 0;
   position: relative;
   width: 100%;
   box-sizing: border-box;

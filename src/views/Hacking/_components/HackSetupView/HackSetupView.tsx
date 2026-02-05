@@ -1,5 +1,4 @@
 import { Input } from "../../../../components/Input";
-import { Panel } from "../../../../components/Panel";
 import { RadioGroup } from "../../../../components/RadioGroup";
 import { matrixSizes } from "../../_constants/matrix";
 import { timerOptions } from "../../_constants/timer";
@@ -24,7 +23,7 @@ export function HackSetupView() {
   } = useHackingContext();
 
   return (
-    <Panel className="setup-panel panel-content">
+    <div className="panel setup-panel panel-content">
       <h2>Hack Setup</h2>
       <div className="setup-section">
         <span className="badge-label">Breach Code</span>
@@ -71,6 +70,8 @@ export function HackSetupView() {
             <Input
               className="equation-input"
               type="number"
+              max={6}
+              min={-3}
               value={knowledge}
               onChange={(event) =>
                 handleKnowledgeChange(Number(event.target.value))
@@ -111,6 +112,6 @@ export function HackSetupView() {
           onChange={handleTimerChange}
         />
       </div>
-    </Panel>
+    </div>
   );
 }

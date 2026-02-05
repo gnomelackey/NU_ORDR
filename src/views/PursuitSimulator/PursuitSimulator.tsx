@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
-import { Panel } from "../../components/Panel";
 import { RadioGroup } from "../../components/RadioGroup";
 
-import "../../styles/pursuit.css";
+import "./pursuit.css";
 
 type PursuitType = "running" | "netrunning" | "driving" | "other";
 
@@ -93,43 +92,75 @@ export function PursuitSimulator() {
     setPcs((prev) => prev.filter((pc) => pc.id !== id));
   };
 
-  const computeBaseDelta = (pcTotal: number, npcTotal: number) => {
+  const computeBaseDeltaDetailed = (pcTotal: number, npcTotal: number) => {
     if (npcTotal > pcTotal * 2) {
-      return -rollDie(6) - rollDie(6);
+      const rolls = [rollDie(6), rollDie(6)];
+      return { delta: -(rolls[0] + rolls[1]), rolls, label: "2d6" };
     }
     if (npcTotal < pcTotal / 2) {
-      return rollDie(6) + rollDie(6);
+      const rolls = [rollDie(6), rollDie(6)];
+      return { delta: rolls[0] + rolls[1], rolls, label: "2d6" };
     }
     if (npcTotal > pcTotal) {
-      return -rollDie(6);
+      const rolls = [rollDie(6)];
+      return { delta: -rolls[0], rolls, label: "d6" };
     }
     if (npcTotal < pcTotal) {
-      return rollDie(6);
+      const rolls = [rollDie(6)];
+      return { delta: rolls[0], rolls, label: "d6" };
     }
-    return 0;
+    return { delta: 0, rolls: [], label: "-" };
   };
 
-  const computeHotDelta = (type: "attack" | "defense") => {
+  const computeHotDeltaDetailed = (type: "attack" | "defense") => {
     if (!hotPursuit) {
-      return 0;
+      return {
+        delta: 0,
+        rolls: [],
+        label: type === "attack" ? "Attack" : "Defense",
+      };
     }
     const outcome = type === "attack" ? attackOutcome : defenseOutcome;
     if (outcome === "hit") {
-      return rollDie(6);
+      const rolls = [rollDie(6)];
+      return {
+        delta: rolls[0],
+        rolls,
+        label: type === "attack" ? "Attack d6" : "Defense d6",
+      };
     }
     if (outcome === "crit") {
-      return rollDie(6) + rollDie(6);
-    }
-    if (outcome === "fumble") {
-      return -rollDie(6);
-    }
-    if (outcome === "fail") {
-      return -rollDie(6);
+      const rolls = [rollDie(6), rollDie(6)];
+      return {
+        delta: rolls[0] + rolls[1],
+        rolls,
+        label: type === "attack" ? "Attack 2d6" : "Defense 2d6",
+      };
     }
     if (outcome === "fumble" && type === "defense") {
-      return -(rollDie(6) + rollDie(6));
+      const rolls = [rollDie(6), rollDie(6)];
+      return { delta: -(rolls[0] + rolls[1]), rolls, label: "Defense 2d6" };
     }
-    return 0;
+    if (outcome === "fumble" || outcome === "fail") {
+      const rolls = [rollDie(6)];
+      return {
+        delta: -rolls[0],
+        rolls,
+        label: type === "attack" ? "Attack d6" : "Defense d6",
+      };
+    }
+    return {
+      delta: 0,
+      rolls: [],
+      label: type === "attack" ? "Attack" : "Defense",
+    };
+  };
+
+  const formatRolls = (label: string, rolls: number[]) => {
+    if (!rolls.length) {
+      return "";
+    }
+    return `${label} [${rolls.join("+")}]`;
   };
 
   const rollSetup = () => {
@@ -178,13 +209,27 @@ export function PursuitSimulator() {
     const npcRoll = rollDie(20) + npcStat;
     const highest = pcRolls.sort((a, b) => b.total - a.total)[0] ?? null;
 
-    const baseDelta = highest
-      ? computeBaseDelta(highest.total, npcRoll)
-      : -rollDie(6);
-    const attackDelta = computeHotDelta("attack");
-    const defenseDelta = computeHotDelta("defense");
+    const baseDetail = highest
+      ? computeBaseDeltaDetailed(highest.total, npcRoll)
+      : (() => {
+          const roll = rollDie(6);
+          return { delta: -roll, rolls: [roll], label: "d6" };
+        })();
+    const attackDetail = computeHotDeltaDetailed("attack");
+    const defenseDetail = computeHotDeltaDetailed("defense");
+    const baseDelta = baseDetail.delta;
+    const attackDelta = attackDetail.delta;
+    const defenseDelta = defenseDetail.delta;
     const totalDelta = baseDelta + attackDelta + defenseDelta;
     const nextTracker = clamp(tracker + totalDelta, 1, 20);
+
+    const rollDetails = [
+      formatRolls(baseDetail.label, baseDetail.rolls),
+      formatRolls(attackDetail.label, attackDetail.rolls),
+      formatRolls(defenseDetail.label, defenseDetail.rolls),
+    ]
+      .filter(Boolean)
+      .join(" · ");
 
     setTracker(nextTracker);
     setLastRoll({
@@ -196,10 +241,13 @@ export function PursuitSimulator() {
       defenseDelta,
       totalDelta,
     });
-    setLog((prev) => [
-      `Round: ${highest?.name ?? "No PC"} ${highest?.total ?? 0} vs NPC ${npcRoll} → ${totalDelta >= 0 ? "+" : ""}${totalDelta} (tracker ${nextTracker}).`,
-      ...prev,
-    ]);
+    setLog((prev) => {
+      const detailSuffix = rollDetails ? ` | Rolls: ${rollDetails}` : "";
+      return [
+        `Round: ${highest?.name ?? "No PC"} ${highest?.total ?? 0} vs NPC ${npcRoll} → ${totalDelta >= 0 ? "+" : ""}${totalDelta} (tracker ${nextTracker}).${detailSuffix}`,
+        ...prev,
+      ];
+    });
   };
 
   const applyAid = () => {
@@ -215,7 +263,8 @@ export function PursuitSimulator() {
       rollDie(20) +
       (pcs.find((pc) => pc.id === lastRoll.highestPc?.id)?.stat ?? 0);
     const highestTotal = Math.max(lastRoll.highestPc.total, reroll);
-    const baseDelta = computeBaseDelta(highestTotal, lastRoll.npcRoll);
+    const baseDetail = computeBaseDeltaDetailed(highestTotal, lastRoll.npcRoll);
+    const baseDelta = baseDetail.delta;
     const totalDelta = baseDelta + lastRoll.attackDelta + lastRoll.defenseDelta;
     const nextTracker = clamp(
       tracker + (totalDelta - lastRoll.totalDelta),
@@ -253,7 +302,7 @@ export function PursuitSimulator() {
       </div>
 
       <div className="setup-grid pursuit-grid">
-        <Panel className="setup-panel panel-content">
+        <div className="panel setup-panel panel-content">
           <h2>Setup</h2>
           <div className="setup-section">
             <span className="badge-label">Pursuit Type</span>
@@ -266,16 +315,23 @@ export function PursuitSimulator() {
           </div>
 
           <div className="setup-section">
-            <span className="badge-label">NPC Stat</span>
+            <span className="badge-label">NPC Modifier</span>
             <Input
               type="number"
               value={npcStat}
+              max={6}
+              min={-3}
               onChange={(event) => setNpcStat(Number(event.target.value))}
             />
           </div>
 
           <div className="setup-section">
-            <span className="badge-label">PCs</span>
+            <div className="pc-row pc-row--header">
+              <span className="badge-label">PCs</span>
+              <span className="badge-label">Mod</span>
+              <span className="badge-label" aria-hidden="true" />
+              <span className="badge-label" aria-hidden="true" />
+            </div>
             <div className="pc-list">
               {pcs.map((pc) => (
                 <div key={pc.id} className="pc-row">
@@ -341,9 +397,9 @@ export function PursuitSimulator() {
           <div className="setup-section">
             <Button onClick={rollSetup}>Roll Setup</Button>
           </div>
-        </Panel>
+        </div>
 
-        <Panel className="matrix-panel">
+        <div className="panel matrix-panel">
           <div className="panel-content">
             <div className="panel-header pursuit-header">
               <div className="matrix-title">
@@ -417,7 +473,7 @@ export function PursuitSimulator() {
               </div>
             </div>
           </div>
-        </Panel>
+        </div>
       </div>
     </section>
   );
