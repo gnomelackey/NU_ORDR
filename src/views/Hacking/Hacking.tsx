@@ -2,6 +2,8 @@ import { HackSetupView } from "./_components/HackSetupView";
 import { MatrixDiceView } from "./_components/MatrixDiceView";
 import { HackingProvider } from "./_contexts/HackingContext";
 
+import "../../styles/hacking.css";
+
 export function Hacking() {
   return (
     <HackingProvider>

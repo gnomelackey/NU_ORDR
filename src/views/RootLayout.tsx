@@ -3,6 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 const navItems = [
   { to: "/", label: "Overview" },
   { to: "/hacking", label: "Hacking" },
+  { to: "/pursuit-simulator", label: "Pursuit" },
 ];
 
 export function RootLayout() {

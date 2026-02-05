@@ -147,12 +147,12 @@ export function HackingProvider({ children }: { children: ReactNode }) {
 
   const rollBreach = () => {
     setBreachCode(rollDie(6));
-    resetHackFromSetupChange();
+    if (hasMatrix) resetHackFromSetupChange();
   };
 
   const rollKnowledge = () => {
     setKnowledge(rollDie(4) - rollDie(4));
-    resetHackFromSetupChange();
+    if (hasMatrix) resetHackFromSetupChange();
   };
 
   const handleBreachInput = (value: string) => {
@@ -161,7 +161,8 @@ export function HackingProvider({ children }: { children: ReactNode }) {
 
     const clamped = Math.min(6, Math.max(1, next));
     setBreachCode(clamped);
-    resetHackFromSetupChange();
+    
+    if (hasMatrix) resetHackFromSetupChange();
   };
 
   const rollMatrix = () => {
@@ -179,7 +180,7 @@ export function HackingProvider({ children }: { children: ReactNode }) {
 
   const rollAttempts = () => {
     setAttemptRoll(rollDie(4));
-    resetHackFromSetupChange();
+    if (hasMatrix) resetHackFromSetupChange();
   };
 
   const endHackNow = () => {
