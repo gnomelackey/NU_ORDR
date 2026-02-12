@@ -4,6 +4,8 @@ import { matrixSizes } from "../../_constants/matrix";
 import { timerOptions } from "../../_constants/timer";
 import { useHackingContext } from "../../_contexts/HackingContext";
 
+import "./HackSetupView.css";
+
 export function HackSetupView() {
   const {
     breachCode,

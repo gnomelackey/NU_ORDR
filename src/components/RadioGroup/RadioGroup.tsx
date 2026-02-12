@@ -1,3 +1,5 @@
+import "./RadioGroup.css";
+
 type RadioValue = string | number;
 
 type Option<T extends RadioValue> = {

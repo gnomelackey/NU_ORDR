@@ -294,6 +294,12 @@ export function PursuitSimulator() {
 
   const trackerState =
     tracker <= 1 ? "NPCs escape" : tracker >= 20 ? "PCs catch NPCs" : "Ongoing";
+  const trackerStateClass =
+    trackerState === "PCs catch NPCs"
+      ? "tracker-card--success"
+      : trackerState === "NPCs escape"
+        ? "tracker-card--fail"
+        : "tracker-card--ongoing";
 
   return (
     <section className="page pursuit-page">
@@ -411,7 +417,7 @@ export function PursuitSimulator() {
               </div>
             </div>
             <div className="pursuit-content">
-              <div className="tracker-card">
+              <div className={`tracker-card ${trackerStateClass}`}>
                 <div className="tracker-value">{tracker}</div>
                 <div className="tracker-status">{trackerState}</div>
               </div>
@@ -442,7 +448,7 @@ export function PursuitSimulator() {
                 <div className="panel pursuit-panel">
                   <span className="badge-label">Aid</span>
                   <select
-                    className="input"
+                    className="pursuit-select"
                     value={aidPcId}
                     onChange={(event) => setAidPcId(event.target.value)}
                   >

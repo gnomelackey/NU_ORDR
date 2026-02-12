@@ -1,0 +1,40 @@
+.button {
+  background: linear-gradient(
+    120deg,
+    rgba(225, 6, 0, 0.8),
+    rgba(255, 59, 48, 0.9)
+  );
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 10px 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.button:disabled,
+.button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: grayscale(0.4);
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(225, 6, 0, 0.35);
+}
+
+.button:disabled:hover,
+.button[disabled]:hover {
+  transform: none;
+}
+
+.button--ghost {
+  background: transparent;
+  border: 1px solid rgba(225, 6, 0, 0.45);
+}

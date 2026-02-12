@@ -1,0 +1,19 @@
+.radio-group {
+  display: grid;
+  gap: 8px;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  color: var(--muted);
+}
+
+.radio-item input {
+  accent-color: var(--accent);
+  transform: scale(1.1);
+}

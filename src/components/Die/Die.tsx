@@ -1,3 +1,5 @@
+import "./Die.css";
+
 export type DieProps = {
   value: number;
   glow?: boolean;

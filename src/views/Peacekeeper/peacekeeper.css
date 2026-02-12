@@ -1,0 +1,25 @@
+.peacekeeper-page .hero-actions {
+  margin-top: 16px;
+}
+
+.peacekeeper-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.peacekeeper-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.peacekeeper-panel h2 {
+  margin: 0 0 12px;
+}
+
+.gear-section {
+  margin-top: 20px;
+  display: grid;
+  gap: 12px;
+}

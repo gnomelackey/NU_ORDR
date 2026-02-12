@@ -4,6 +4,7 @@ const navItems = [
   { to: "/", label: "Overview" },
   { to: "/hacking", label: "Hacking" },
   { to: "/pursuit-simulator", label: "Pursuit" },
+  { to: "/peacekeeper", label: "Peacekeeper" },
 ];
 
 export function RootLayout() {

@@ -3,6 +3,7 @@ import { Hacking } from "./views/Hacking";
 import { Home } from "./views/Home";
 import { NotFound } from "./views/NotFound";
 import { PursuitSimulator } from "./views/PursuitSimulator/PursuitSimulator";
+import { Peacekeeper } from "./views/Peacekeeper/Peacekeeper";
 import { RootLayout } from "./views/RootLayout";
 
 export const router = createBrowserRouter([
@@ -13,6 +14,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "hacking", element: <Hacking /> },
       { path: "pursuit-simulator", element: <PursuitSimulator /> },
+      { path: "peacekeeper", element: <Peacekeeper /> },
       { path: "*", element: <NotFound /> },
     ],
   },

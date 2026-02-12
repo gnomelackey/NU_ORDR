@@ -265,47 +265,6 @@ select {
   animation: pulse 3s ease-in-out infinite;
 }
 
-.button {
-  background: linear-gradient(
-    120deg,
-    rgba(225, 6, 0, 0.8),
-    rgba(255, 59, 48, 0.9)
-  );
-  border: 1px solid transparent;
-  border-radius: 999px;
-  padding: 10px 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.2rem;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.button:disabled,
-.button[disabled] {
-  opacity: 0.45;
-  cursor: not-allowed;
-  box-shadow: none;
-  filter: grayscale(0.4);
-}
-
-.button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(225, 6, 0, 0.35);
-}
-
-.button:disabled:hover,
-.button[disabled]:hover {
-  transform: none;
-}
-
-.button--ghost {
-  background: transparent;
-  border: 1px solid rgba(225, 6, 0, 0.45);
-}
-
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -335,26 +294,6 @@ select {
   grid-template-columns: 30% 1fr;
   gap: 24px;
   align-items: start;
-}
-
-.radio-group {
-  display: grid;
-  gap: 8px;
-}
-
-.radio-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12rem;
-  color: var(--muted);
-}
-
-.radio-item input {
-  accent-color: var(--accent);
-  transform: scale(1.1);
 }
 
 .panel-header {
@@ -404,63 +343,11 @@ select {
 }
 
 .field select,
-.field input,
-.input {
+.field input {
   padding: 10px 12px;
   background: rgba(6, 8, 12, 0.8);
   border: 1px solid rgba(225, 6, 0, 0.35);
   border-radius: 10px;
-}
-
-.input-with-dice {
-  position: relative;
-  display: inline-flex;
-  width: 100%;
-}
-
-.input-dice {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: 1px solid rgba(225, 6, 0, 0.6);
-  background: rgba(6, 6, 6, 0.8);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-}
-
-.input-dice:hover {
-  box-shadow: 0 0 12px rgba(225, 6, 0, 0.35);
-}
-
-.input-dice-face {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  border: 1px solid rgba(225, 6, 0, 0.7);
-  position: relative;
-}
-
-.input-dice-face::after {
-  content: "";
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(225, 6, 0, 0.9);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.input--with-dice {
-  padding-right: 52px;
 }
 
 .callout {

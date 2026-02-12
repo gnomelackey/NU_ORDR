@@ -1,0 +1,50 @@
+.die {
+  position: relative;
+  background: rgba(8, 12, 20, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  box-shadow: inset 0 0 12px rgba(225, 6, 0, 0.2);
+  min-width: 90px;
+  width: 90px;
+}
+
+.die--glow {
+  border-color: rgba(225, 6, 0, 0.8);
+  box-shadow: 0 0 18px rgba(225, 6, 0, 0.45);
+}
+
+.die-face {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  justify-self: center;
+}
+
+.pip--on {
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(225, 6, 0, 0.8);
+}
+
+.die-value {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.die-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  color: var(--muted);
+}
