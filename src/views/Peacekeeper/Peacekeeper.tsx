@@ -16,6 +16,7 @@ type PeacekeeperProfile = {
   helmetUpgrade: string;
   extraGearRoll?: { table: string; result: string };
   hp: number;
+  creds: number;
   height: string;
   weight: number;
   generations: number;
@@ -48,12 +49,12 @@ const dutyBeltTable = [
 ];
 
 const d3m1ModuleTable = [
-  "7UR713: activate for -d6 damage reduction",
+  "7UR713 [Activated]: -d6 damage reduction",
   "K1N37C [Immediate]: build kinetic energy; release to reduce breach tests or push targets",
   "M3D1C [Immediate]: heal d6 HP and gain 1 adrenaline",
-  "C4M0: invisible when stationary; otherwise -2 DR to defense",
-  "73MP: temperature regulated, invisible to machines/sensors",
-  "47HL37: reinforced joints; -4 DR on run/jump/swim/climb",
+  "C4M0 [Activated]: invisible when stationary; otherwise -2 DR to defense",
+  "73MP [Activated]: temperature regulated, invisible to machines/sensors",
+  "47HL37 [Activated]: reinforced joints; -4 DR on run/jump/swim/climb",
 ];
 
 const helmetUpgradeTable = [
@@ -139,6 +140,8 @@ const familyBackgrounds = [
   "Construction",
 ];
 
+const rehabTag = "::rehabilitated::";
+
 const signatureWords = [
   "Overzealous",
   "Ruthless",
@@ -162,7 +165,25 @@ const signatureWords = [
   "Exacting",
 ];
 
-const abilityList = ["Strength", "Agility", "Presence", "Toughness", "Knowledge"];
+const moduleLabel = (entry: string) => {
+  const match = entry.match(/^(.*)\s\[(Immediate|Activated)\]:\s?(.*)$/);
+  if (!match) {
+    return { name: entry, mode: "", description: "" };
+  }
+  return {
+    name: match[1].trim(),
+    mode: match[2],
+    description: match[3].trim(),
+  };
+};
+
+const abilityList = [
+  "Strength",
+  "Agility",
+  "Presence",
+  "Toughness",
+  "Knowledge",
+];
 
 const rollDie = (sides: number) => Math.floor(Math.random() * sides) + 1;
 const rollD4MinusD4 = () => rollDie(4) - rollDie(4);
@@ -175,7 +196,8 @@ export function Peacekeeper() {
   const [profile, setProfile] = useState<PeacekeeperProfile | null>(null);
 
   const generatePeacekeeper = () => {
-    const rollSpecialization = Math.random() < 0.15 ? null : pick(specializations);
+    const rollSpecialization =
+      Math.random() < 0.15 ? null : pick(specializations);
 
     const abilities: Record<string, number> = {};
     abilityList.forEach((ability) => {
@@ -212,6 +234,7 @@ export function Peacekeeper() {
 
     const toughness = abilities.Toughness ?? 0;
     const hp = toughness + rollDie(8);
+    const creds = (rollDie(6) + rollDie(6)) * 10;
 
     const feet = rollDie(2) + 5;
     const inchesRoll = rollDie(12);
@@ -232,6 +255,7 @@ export function Peacekeeper() {
       helmetUpgrade,
       extraGearRoll,
       hp,
+      creds,
       height,
       weight,
       generations,
@@ -241,7 +265,6 @@ export function Peacekeeper() {
     });
   };
 
-  
   useEffect(() => {
     if (!profile) {
       generatePeacekeeper();
@@ -280,49 +303,86 @@ export function Peacekeeper() {
         </div>
       ) : (
         <div className="peacekeeper-grid">
-          <div className="panel scanline-card peacekeeper-panel">
-            <span className="badge-label">Specialization</span>
-            <h2>{profile.specialization?.name ?? "Unassigned"}</h2>
-            <p className="lede">
-              {profile.specialization
-                ? "Keeper specialization active. Cadet perk not listed in provided rules." :
-                  "No specialization. Ability bonuses applied + extra gear roll."}
-            </p>
-            <ul className="rule-list">
-              {(profile.specialization?.perks ?? [
-                "+2 to two ability scores",
-                "Roll twice for each ability and keep the higher",
-                profile.extraGearRoll
-                  ? `Extra gear roll: ${profile.extraGearRoll.table}`
-                  : "",
-              ])
-                .filter(Boolean)
-                .map((perk) => (
-                  <li key={perk}>{perk}</li>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            <div className="panel scanline-card peacekeeper-panel">
+              <span className="badge-label">Specialization</span>
+              <h2>{profile.specialization?.name ?? "Unassigned"}</h2>
+              <p className="lede">
+                {profile.specialization
+                  ? "Keeper specialization active. Cadet perk not listed in provided rules."
+                  : "No specialization. Ability bonuses applied + extra gear roll."}
+              </p>
+              <ul className="rule-list">
+                {(
+                  profile.specialization?.perks ?? [
+                    "+2 to two ability scores",
+                    "Roll twice for each ability and keep the higher",
+                    profile.extraGearRoll
+                      ? `Extra gear roll: ${profile.extraGearRoll.table}`
+                      : "",
+                  ]
+                )
+                  .filter(Boolean)
+                  .map((perk) => (
+                    <li key={perk}>{perk}</li>
+                  ))}
+              </ul>
+
+              <div className="status-grid">
+                {abilityEntries.map((ability) => (
+                  <div key={ability.name}>
+                    <span className="status-label">{ability.name}</span>
+                    <span className="status-value">{ability.value}</span>
+                  </div>
                 ))}
-            </ul>
+              </div>
+            </div>
 
-            <div className="status-grid">
-              {abilityEntries.map((ability) => (
-                <div key={ability.name}>
-                  <span className="status-label">{ability.name}</span>
-                  <span className="status-value">{ability.value}</span>
+            <div className="panel peacekeeper-panel">
+              <div
+                className="panel-content"
+                style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+              >
+                <h2>Personal Touches</h2>
+                <div className="callout">
+                  <span>HP</span>
+                  <strong>{profile.hp}</strong>
                 </div>
-              ))}
-            </div>
-
-            <div className="callout">
-              <span>HP Start</span>
-              <strong>{profile.hp}</strong>
-            </div>
-            <div className="callout">
-              <span>Height / Weight</span>
-              <strong>
-                {profile.height} / {profile.weight} lbs
-              </strong>
+                <div className="callout">
+                  <span>Height / Weight</span>
+                  <strong>
+                    {profile.height} / {profile.weight} lbs
+                  </strong>
+                </div>
+                <div className="callout">
+                  <span>Cred Account</span>
+                  <strong>{profile.creds}¤</strong>
+                </div>
+                <div className="badge-stack">
+                  <div className="badge badge--compact">
+                    <span className="badge-label">Family Legacy</span>
+                    <p>{profile.generations} generations of Keepers</p>
+                    <p>Relationships gained: {profile.relationships}</p>
+                  </div>
+                  <div className="badge badge--compact badge--rehab">
+                    <span className="badge-label">Family Before</span>
+                    {profile.familyBackground.includes(rehabTag) ? (
+                      <span className="rehab-chip">Rehabilitated</span>
+                    ) : null}
+                    <p>
+                      {profile.familyBackground.replace(rehabTag, "").trim()}
+                    </p>
+                  </div>
+                  <div className="badge badge--compact">
+                    <span className="badge-label">Best Fit Word</span>
+                    <p>{profile.signatureWord}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-
           <div className="panel peacekeeper-panel">
             <div className="panel-content">
               <h2>Gear Loadout</h2>
@@ -333,7 +393,21 @@ export function Peacekeeper() {
                 </div>
                 <div className="tool-card">
                   <span className="badge-label">D3M1 Module (d6)</span>
-                  <p>{profile.d3m1Module}</p>
+                  {(() => {
+                    const module = moduleLabel(profile.d3m1Module);
+                    if (!module.mode) {
+                      return <p>{profile.d3m1Module}</p>;
+                    }
+                    return (
+                      <>
+                        <div className="module-title-row">
+                          <p>{module.name}</p>
+                          <span className="module-pill">{module.mode}</span>
+                        </div>
+                        <p>{module.description}</p>
+                      </>
+                    );
+                  })()}
                 </div>
                 <div className="tool-card">
                   <span className="badge-label">Helmet Upgrade (d6)</span>
@@ -343,7 +417,8 @@ export function Peacekeeper() {
                   <div className="tool-card">
                     <span className="badge-label">Extra Roll</span>
                     <p>
-                      {profile.extraGearRoll.table}: {profile.extraGearRoll.result}
+                      {profile.extraGearRoll.table}:{" "}
+                      {profile.extraGearRoll.result}
                     </p>
                   </div>
                 ) : null}
@@ -356,27 +431,6 @@ export function Peacekeeper() {
                     <li key={gear}>{gear}</li>
                   ))}
                 </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="panel peacekeeper-panel">
-            <div className="panel-content">
-              <h2>Final Touches</h2>
-              <div className="badge-stack">
-                <div className="badge">
-                  <span className="badge-label">Family Legacy</span>
-                  <p>{profile.generations} generations of Keepers</p>
-                  <p>Relationships gained: {profile.relationships}</p>
-                </div>
-                <div className="badge">
-                  <span className="badge-label">Family Before</span>
-                  <p>{profile.familyBackground}</p>
-                </div>
-                <div className="badge">
-                  <span className="badge-label">Best Fit Word</span>
-                  <p>{profile.signatureWord}</p>
-                </div>
               </div>
             </div>
           </div>
