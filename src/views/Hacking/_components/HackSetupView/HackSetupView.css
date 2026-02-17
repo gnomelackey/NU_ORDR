@@ -77,7 +77,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-left: 8px;
   width: 18px;
   height: 18px;
   border-radius: 999px;
@@ -89,29 +88,4 @@
   cursor: help;
   letter-spacing: 0;
   position: relative;
-}
-
-.info-icon::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  top: 28px;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: var(--text);
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--accent);
-  font-size: 0.7rem;
-  letter-spacing: 0.08rem;
-  text-transform: none;
-  width: 220px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  z-index: 20;
-}
-
-.info-icon:hover::after {
-  opacity: 1;
 }

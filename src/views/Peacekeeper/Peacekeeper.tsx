@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../components/Button";
+import { Tooltip } from "../../components/Tooltip";
 import "./peacekeeper.css";
 
 type Specialization = {
@@ -282,15 +283,14 @@ export function Peacekeeper() {
   return (
     <section className="page peacekeeper-page">
       <div className="page-header">
-        <p className="eyebrow">Peacekeeper Creation</p>
-        <h1>Arbiter Selection Protocol</h1>
-        <p className="lede">
+        <div className="hero-actions">
+          <p className="eyebrow">Peacekeeper Creation</p>
+          <Button onClick={generatePeacekeeper}>Generate Peacekeeper</Button>
+        </div>
+        <p className="page-description">
           One click. One Peacekeeper. Full kit, specialization, and background
           resolved by the Supreme Court's randomizer.
         </p>
-        <div className="hero-actions">
-          <Button onClick={generatePeacekeeper}>Generate Peacekeeper</Button>
-        </div>
       </div>
 
       {!profile ? (
@@ -343,7 +343,11 @@ export function Peacekeeper() {
             <div className="panel peacekeeper-panel">
               <div
                 className="panel-content"
-                style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                }}
               >
                 <h2>Personal Touches</h2>
                 <div className="callout">
@@ -361,13 +365,26 @@ export function Peacekeeper() {
                   <strong>{profile.creds}¤</strong>
                 </div>
                 <div className="badge-stack">
-                  <div className="badge badge--compact">
+                <div className="badge badge--compact">
+                  <div className="badge-header-row">
                     <span className="badge-label">Family Legacy</span>
-                    <p>{profile.generations} generations of Keepers</p>
-                    <p>Relationships gained: {profile.relationships}</p>
+                    <Tooltip content="Number of Relationships">
+                      <span className="relationship-row">
+                        {profile.relationships}
+                        <span className="relationship-icon" aria-hidden="true">
+                          <img src="/relationship.svg" alt="" />
+                        </span>
+                      </span>
+                    </Tooltip>
                   </div>
+                  <p>
+                    {profile.generations === 0
+                      ? "First generation Keeper"
+                      : `${profile.generations} generations of Keepers`}
+                  </p>
+                </div>
                   <div className="badge badge--compact badge--rehab">
-                    <span className="badge-label">Family Before</span>
+                    <span className="badge-label">Family Occupation</span>
                     {profile.familyBackground.includes(rehabTag) ? (
                       <span className="rehab-chip">Rehabilitated</span>
                     ) : null}
@@ -388,11 +405,11 @@ export function Peacekeeper() {
               <h2>Gear Loadout</h2>
               <div className="tool-grid">
                 <div className="tool-card">
-                  <span className="badge-label">Duty Belt (d6)</span>
+                  <span className="badge-label full-width">Duty Belt (d6)</span>
                   <p>{profile.dutyBelt}</p>
                 </div>
                 <div className="tool-card">
-                  <span className="badge-label">D3M1 Module (d6)</span>
+                  <span className="badge-label full-width">D3M1 Module (d6)</span>
                   {(() => {
                     const module = moduleLabel(profile.d3m1Module);
                     if (!module.mode) {
@@ -410,12 +427,12 @@ export function Peacekeeper() {
                   })()}
                 </div>
                 <div className="tool-card">
-                  <span className="badge-label">Helmet Upgrade (d6)</span>
+                  <span className="badge-label full-width">Helmet Upgrade (d6)</span>
                   <p>{profile.helmetUpgrade}</p>
                 </div>
                 {profile.extraGearRoll ? (
                   <div className="tool-card">
-                    <span className="badge-label">Extra Roll</span>
+                    <span className="badge-label full-width">Extra Roll</span>
                     <p>
                       {profile.extraGearRoll.table}:{" "}
                       {profile.extraGearRoll.result}
@@ -436,6 +453,16 @@ export function Peacekeeper() {
           </div>
         </div>
       )}
+      <footer className="peacekeeper-footer">
+        <a
+          href="https://www.flaticon.com/free-icons/identity"
+          title="identity icons"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Identity icons created by meaicon - Flaticon
+        </a>
+      </footer>
     </section>
   );
 }

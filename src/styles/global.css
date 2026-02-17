@@ -16,6 +16,7 @@
   --accent-3: #ffffff;
   --border: rgba(225, 6, 0, 0.25);
   --shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  --max-width: min(1100px, 100%);
 }
 
 *,
@@ -47,6 +48,7 @@ select {
 .app-shell {
   min-height: 100vh;
   display: flex;
+  align-items: center;
   flex-direction: column;
   position: relative;
   overflow-x: hidden;
@@ -74,6 +76,7 @@ select {
   padding: 28px clamp(20px, 5vw, 72px);
   position: sticky;
   top: 0;
+  width: var(--max-width);
   z-index: 10;
   background: rgba(6, 8, 12, 0.85);
   backdrop-filter: blur(18px);
@@ -101,6 +104,10 @@ select {
   text-transform: uppercase;
 }
 
+.full-width {
+  width: 100%;
+}
+
 .nav {
   display: flex;
   gap: 16px;
@@ -125,9 +132,9 @@ select {
 }
 
 .main-content {
-  flex: 1;
   padding: 32px clamp(20px, 5vw, 72px) 80px;
   position: relative;
+  width: var(--max-width);
   z-index: 1;
 }
 

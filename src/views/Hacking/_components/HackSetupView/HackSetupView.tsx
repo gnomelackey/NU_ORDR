@@ -1,5 +1,6 @@
 import { Input } from "../../../../components/Input";
 import { RadioGroup } from "../../../../components/RadioGroup";
+import { Tooltip } from "../../../../components/Tooltip";
 import { matrixSizes } from "../../_constants/matrix";
 import { timerOptions } from "../../_constants/timer";
 import { useHackingContext } from "../../_contexts/HackingContext";
@@ -43,13 +44,11 @@ export function HackSetupView() {
       <div className="setup-section">
         <span className="badge-label">
           Breaching Attempts
-          <span
-            className="info-icon"
-            data-tooltip="Attempts = max(1, Knowledge + d4 roll). Knowledge can be rolled as d4 - d4."
-            aria-label="Attempts info"
-          >
-            i
-          </span>
+          <Tooltip content="Attempts = max(1, Knowledge + d4 roll). Knowledge can be rolled as d4 - d4.">
+            <span className="info-icon" aria-label="Attempts info">
+              i
+            </span>
+          </Tooltip>
         </span>
         <div className="attempts-equation">
           <label className="equation-field">
